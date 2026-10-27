@@ -6,8 +6,9 @@
   --bg: #faf7f2;
   --card: #ffffff;
   --ink: #33302b;
-  --muted: #8a8378;
-  --accent: #d97757;
+  --muted: #6b6459;
+  --accent: #bb5a3a;
+  --accent-text: #b5502f;
   --border: #e8e2d8;
   color-scheme: light;
 }
@@ -54,12 +55,15 @@ body {
 }
 
 .back-button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   background: none;
   border: none;
   color: var(--muted);
   font-size: 14px;
-  padding: 0;
-  margin-bottom: 8px;
+  padding: 0 8px;
+  margin: -8px 0 0 -8px;
 }
 
 /* Photo picker */
@@ -101,12 +105,19 @@ body {
   display: block;
 }
 
+/* 눈에 보이는 원은 36px이고, 누를 수 있는 영역은 44px로 넓힌다 */
+.photo-remove::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+}
+
 .photo-remove {
   position: absolute;
   top: 8px;
   right: 8px;
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   border: none;
   background: rgba(0, 0, 0, 0.55);
@@ -131,7 +142,7 @@ body {
 }
 
 .diary-counter-full {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .diary-counter-over {
@@ -156,8 +167,9 @@ body {
 }
 
 .diary-textarea:focus {
-  outline: none;
-  border-color: var(--accent);
+  outline: 2px solid var(--accent-text);
+  outline-offset: 1px;
+  border-color: var(--accent-text);
 }
 
 /* Buttons */
@@ -253,7 +265,7 @@ body {
 }
 
 .nav-tab-active {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .nav-icon {
@@ -354,10 +366,15 @@ mark {
 }
 
 .list-text-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
   background: none;
   border: none;
-  padding: 4px 0;
-  color: var(--accent);
+  padding: 0 8px;
+  color: var(--accent-text);
   font-size: 15px;
   font-weight: 600;
   white-space: nowrap;
@@ -383,8 +400,9 @@ mark {
 }
 
 .list-search input:focus {
-  outline: none;
-  border-color: var(--accent);
+  outline: 2px solid var(--accent-text);
+  outline-offset: 1px;
+  border-color: var(--accent-text);
 }
 
 .list-select-bar {
@@ -447,6 +465,14 @@ mark {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.book-select-item input {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  margin: 0;
+  accent-color: var(--accent);
 }
 
 .book-select-item label {
@@ -617,7 +643,7 @@ mark {
 
 .calendar-cell-outside {
   background: transparent;
-  color: var(--border);
+  color: #a8a093;
 }
 
 .calendar-cell-today {
@@ -640,12 +666,12 @@ mark {
 .calendar-dots {
   display: flex;
   gap: 3px;
-  height: 6px;
+  height: 8px;
 }
 
 .calendar-dot {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
 }
 
@@ -721,6 +747,7 @@ mark {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  min-height: 40px;
   padding: 8px 12px;
   border: 1px solid var(--border);
   border-radius: 999px;
@@ -741,24 +768,33 @@ mark {
   opacity: 0.7;
 }
 
+/* 주제가 많아도 높이가 늘지 않도록 한 줄로 두고 옆으로 넘긴다. 오른쪽 끝은 살짝 흐려 더 있음을 알린다. */
+.chip-row-scroll {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  padding-right: 24px;
+  margin-bottom: 8px;
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+}
+
+.chip-row-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.chip-row-scroll .chip {
+  flex: none;
+}
+
 .topic-picker {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 10px;
   margin-bottom: 6px;
 }
 
-.topic-picker .chip-row {
-  flex: 1;
-  margin-bottom: 8px;
-}
-
-.topic-manage-link {
-  flex: none;
-  padding: 8px 0;
-  color: var(--accent);
-  font-size: 14px;
+.chip-link {
+  border-style: dashed;
+  color: var(--accent-text);
   font-weight: 600;
   text-decoration: none;
   white-space: nowrap;
@@ -825,27 +861,39 @@ mark {
 }
 
 .topic-form input:focus {
-  outline: none;
-  border-color: var(--accent);
+  outline: 2px solid var(--accent-text);
+  outline-offset: 1px;
+  border-color: var(--accent-text);
 }
 
 .color-swatches {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(4, 44px);
+  gap: 8px 16px;
 }
 
+/* 누르는 영역은 44px, 눈에 보이는 색 원은 32px. 선택하면 바깥 링과 ✓가 보인다. */
 .color-swatch {
-  width: 32px;
-  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  border: 3px solid transparent;
+  border: 6px solid transparent;
+  background-clip: content-box;
   padding: 0;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
 }
 
 .color-swatch-active {
-  border-color: var(--card);
-  box-shadow: 0 0 0 2px var(--ink);
+  box-shadow: inset 0 0 0 2px var(--ink);
+}
+
+.color-swatch-active::after {
+  content: '✓';
 }
 
 .topic-form-actions {
@@ -896,7 +944,7 @@ mark {
 .backup-status {
   font-size: 14px;
   text-align: center;
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .backup-status-error {

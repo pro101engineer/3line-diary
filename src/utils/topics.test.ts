@@ -5,7 +5,9 @@ import {
   NO_TOPIC_COLOR,
   NO_TOPIC_LABEL,
   TOPIC_COLORS,
+  colorName,
   hasTopicName,
+  normalizeTopicColor,
   topicColor,
   topicMap,
   topicName,
@@ -43,5 +45,22 @@ describe('topics', () => {
 
   it('색 팔레트에 중복이 없다', () => {
     expect(new Set(TOPIC_COLORS).size).toBe(TOPIC_COLORS.length);
+  });
+
+  it('예전 팔레트 색은 같은 순서의 새 색으로 바꿔 보여 준다', () => {
+    expect(normalizeTopicColor('#d97757')).toBe(TOPIC_COLORS[0]);
+    expect(normalizeTopicColor('#8A8378')).toBe(TOPIC_COLORS[7]);
+    expect(normalizeTopicColor(TOPIC_COLORS[3])).toBe(TOPIC_COLORS[3]);
+    expect(normalizeTopicColor('#123456')).toBe('#123456');
+  });
+
+  it('색마다 이름이 있어 스크린리더가 색을 읽을 수 있다', () => {
+    expect(colorName(TOPIC_COLORS[0])).toBe('코랄');
+    expect(colorName('#123456')).toBe('색 #123456');
+    expect(new Set(TOPIC_COLORS.map(colorName)).size).toBe(TOPIC_COLORS.length);
+  });
+
+  it('주제 없음 색은 팔레트 색과 겹치지 않는다', () => {
+    expect(TOPIC_COLORS).not.toContain(NO_TOPIC_COLOR);
   });
 });

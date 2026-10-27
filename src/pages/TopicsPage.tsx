@@ -2,7 +2,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { deleteTopic, listEntries, listTopics, saveTopic } from '../db/db';
 import { Topic } from '../types';
-import { MAX_TOPICS, MAX_TOPIC_NAME, TOPIC_COLORS } from '../utils/topics';
+import { MAX_TOPICS, MAX_TOPIC_NAME, TOPIC_PALETTE, colorName } from '../utils/topics';
+
+const TOPIC_COLORS = TOPIC_PALETTE.map((c) => c.hex);
 
 interface FormProps {
   initial: { name: string; color: string };
@@ -46,8 +48,8 @@ function TopicForm({ initial, submitLabel, onSubmit, onCancel }: FormProps) {
             key={c}
             type="button"
             className={'color-swatch' + (c === color ? ' color-swatch-active' : '')}
-            style={{ background: c }}
-            aria-label={`색 ${c}`}
+            style={{ backgroundColor: c }}
+            aria-label={colorName(c)}
             aria-pressed={c === color}
             onClick={() => setColor(c)}
           />

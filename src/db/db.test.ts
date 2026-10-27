@@ -11,7 +11,7 @@ import {
   saveEntry,
   saveTopic,
 } from './db';
-import { MAX_PER_DAY, MAX_TOPICS, MAX_TOPIC_NAME } from '../utils/topics';
+import { MAX_PER_DAY, MAX_TOPICS, MAX_TOPIC_NAME, TOPIC_COLORS } from '../utils/topics';
 
 const TEXT = '아침\n점심\n저녁';
 const D = '2026-08-29';
@@ -94,6 +94,12 @@ describe('saveEntry / getEntry', () => {
     const e = await write();
     await write({ id: e.id, topicId: topic.id });
     expect((await getEntry(e.id))?.topicId).toBe(topic.id);
+  });
+
+  it('예전 팔레트 색으로 저장된 주제는 새 색으로 읽힌다', async () => {
+    await saveTopic({ name: '옛 주제', color: '#d97757' });
+    const [topic] = (await listTopics()).filter((t) => t.name === '옛 주제');
+    expect(topic.color).toBe(TOPIC_COLORS[0]);
   });
 
   it('사진을 null로 저장하면 사진이 지워진다', async () => {

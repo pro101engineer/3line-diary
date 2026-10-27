@@ -24,10 +24,12 @@ export function TopicPicker({ topics, value, onChange }: Props) {
         value={value ?? NONE}
         onChange={(key) => onChange(key === NONE ? null : key)}
         ariaLabel="일기 주제"
-      />
-      <Link className="topic-manage-link" to="/topics">
-        {topics.length === 0 ? '주제 만들기' : '주제 관리'}
-      </Link>
+        scrollable
+      >
+        <Link className="chip chip-link topic-manage-link" to="/topics">
+          {topics.length === 0 ? '+ 주제 만들기' : '주제 관리'}
+        </Link>
+      </ChipRow>
     </div>
   );
 }

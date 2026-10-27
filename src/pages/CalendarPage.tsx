@@ -13,10 +13,19 @@ import {
   WEEKDAY_LABELS,
   YearMonth,
 } from '../utils/calendar';
-import { MAX_PER_DAY, topicColor, topicMap } from '../utils/topics';
+import { MAX_PER_DAY, topicColor, topicMap, topicName } from '../utils/topics';
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const MAX_DOTS = MAX_PER_DAY;
+
+/** 스크린리더가 날짜와 함께 그날 일기의 주제 이름까지 읽도록 한다. */
+function cellLabel(date: string, list: DiaryEntry[], topicsById: Map<string, Topic>): string {
+  const [y, m, d] = date.split('-').map(Number);
+  const base = `${y}년 ${m}월 ${d}일`;
+  if (list.length === 0) return base;
+  const names = list.map((e) => topicName(e.topicId ? topicsById.get(e.topicId) : null));
+  return `${base}, 일기 ${list.length}개: ${names.join(', ')}`;
+}
 
 function monthOf(date: string): YearMonth {
   const [year, month] = date.split('-').map(Number);
@@ -124,7 +133,7 @@ export function CalendarPage() {
               type="button"
               className={classes.join(' ')}
               disabled={isFuture}
-              aria-label={`${cell.date}${list.length > 0 ? ` 일기 ${list.length}개` : ''}`}
+              aria-label={cellLabel(cell.date, list, topicsById)}
               onClick={() => setParams({ d: cell.date }, { replace: true })}
             >
               <span className="calendar-day">{cell.day}</span>

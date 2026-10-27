@@ -24,6 +24,13 @@ async function addTopic(name: string) {
 }
 
 describe('TopicsPage', () => {
+  it('색 선택 버튼은 색 이름으로 읽히고 선택된 색을 알려 준다', async () => {
+    renderPage();
+    const coral = await screen.findByRole('button', { name: '코랄' });
+    expect(coral.getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByRole('button', { name: '갈색' }).getAttribute('aria-pressed')).toBe('false');
+  });
+
   it('주제가 없으면 안내하고 새 주제를 만들 수 있다', async () => {
     renderPage();
     expect(await screen.findByText(/아직 주제가 없어요/)).toBeDefined();

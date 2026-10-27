@@ -5,19 +5,34 @@ export const MAX_PER_DAY = 3;
 export const MAX_TOPICS = 12;
 export const MAX_TOPIC_NAME = 12;
 
-export const TOPIC_COLORS = [
-  '#d97757', // 코랄
-  '#c9a227', // 머스터드
-  '#6a994e', // 올리브 그린
-  '#2a9d8f', // 청록
-  '#4a7fb5', // 파랑
-  '#7b6cb5', // 보라
-  '#c25b8a', // 핑크
-  '#8a8378', // 회색
+// 색약(적록·청황)에서도 서로 구분되도록 고른 색. 가장 비슷한 두 색의 차이(ΔE)가 정상 시야 32, 적록색약 12 이상이다.
+export const TOPIC_PALETTE = [
+  { hex: '#e15748', name: '코랄' },
+  { hex: '#9e871a', name: '머스터드' },
+  { hex: '#507920', name: '초록' },
+  { hex: '#008082', name: '청록' },
+  { hex: '#008de9', name: '파랑' },
+  { hex: '#7956b8', name: '보라' },
+  { hex: '#de559b', name: '핑크' },
+  { hex: '#634320', name: '갈색' },
 ];
+export const TOPIC_COLORS = TOPIC_PALETTE.map((c) => c.hex);
 
-// 주제가 없는 일기를 표시하는 색
-export const NO_TOPIC_COLOR = '#b9b2a6';
+// 예전 팔레트(같은 순서)로 저장된 주제 색은 읽을 때 새 색으로 바꿔 보여 준다.
+const LEGACY_COLORS = ['#d97757', '#c9a227', '#6a994e', '#2a9d8f', '#4a7fb5', '#7b6cb5', '#c25b8a', '#8a8378'];
+
+export function normalizeTopicColor(color: string): string {
+  const i = LEGACY_COLORS.indexOf(color.toLowerCase());
+  return i >= 0 ? TOPIC_COLORS[i] : color;
+}
+
+/** 스크린리더용 색 이름. 팔레트에 없는 색이면 "색 #hex" */
+export function colorName(color: string): string {
+  return TOPIC_PALETTE.find((c) => c.hex === color.toLowerCase())?.name ?? `색 ${color}`;
+}
+
+// 주제가 없는 일기를 표시하는 색 (흰 바탕에서 3:1 이상)
+export const NO_TOPIC_COLOR = '#8a8378';
 export const NO_TOPIC_LABEL = '주제 없음';
 
 export function topicColor(topic: Topic | undefined | null): string {

@@ -4,7 +4,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { CalendarPage } from './CalendarPage';
 import { deleteEntry, deleteTopic, listEntries, listTopics, saveEntry, saveTopic } from '../db/db';
-import { MAX_PER_DAY } from '../utils/topics';
+import { MAX_PER_DAY, TOPIC_COLORS } from '../utils/topics';
 
 const TEXT = '아침\n점심\n저녁';
 
@@ -56,23 +56,33 @@ describe('CalendarPage', () => {
     await write('2026-08-03', { text: '둘째' });
     renderPage();
 
-    const marked = await screen.findByLabelText('2026-08-03 일기 2개');
+    const marked = await screen.findByLabelText(/^2026년 8월 3일, 일기 2개/);
     expect(marked.className).toContain('calendar-cell-has-entry');
-    expect(screen.getByLabelText('2026-08-04').className).not.toContain('calendar-cell-has-entry');
+    expect(screen.getByLabelText('2026년 8월 4일').className).not.toContain('calendar-cell-has-entry');
   });
 
   it('일기마다 주제 색의 점을 찍는다 (주제 없음은 회색 계열)', async () => {
-    const topic = await saveTopic({ name: '가족', color: '#d97757' });
+    const topic = await saveTopic({ name: '가족', color: TOPIC_COLORS[0] });
     await write('2026-08-03', { topicId: topic.id });
     vi.setSystemTime(new Date(Date.now() + 1000));
     await write('2026-08-03', { text: '주제 없는 일기' });
     renderPage();
 
-    const cell = await screen.findByLabelText('2026-08-03 일기 2개');
+    const cell = await screen.findByLabelText(/^2026년 8월 3일, 일기 2개/);
     const dots = cell.querySelectorAll('.calendar-dot');
     expect(dots).toHaveLength(2);
-    expect((dots[0] as HTMLElement).style.background).toContain('rgb(217, 119, 87)');
-    expect((dots[1] as HTMLElement).style.background).not.toContain('rgb(217, 119, 87)');
+    expect((dots[0] as HTMLElement).style.background).toContain('rgb(225, 87, 72)');
+    expect((dots[1] as HTMLElement).style.background).not.toContain('rgb(225, 87, 72)');
+  });
+
+  it('스크린리더가 읽는 이름에 그날 일기의 주제가 들어 있다', async () => {
+    const topic = await saveTopic({ name: '가족', color: TOPIC_COLORS[0] });
+    await write('2026-08-03', { topicId: topic.id });
+    vi.setSystemTime(new Date(Date.now() + 1000));
+    await write('2026-08-03', { text: '주제 없는 일기' });
+    renderPage();
+
+    expect(await screen.findByLabelText('2026년 8월 3일, 일기 2개: 가족, 주제 없음')).toBeDefined();
   });
 
   it(`점은 최대 ${MAX_PER_DAY}개까지만 찍는다`, async () => {
@@ -81,7 +91,7 @@ describe('CalendarPage', () => {
       vi.setSystemTime(new Date(Date.now() + 1000));
     }
     renderPage();
-    const cell = await screen.findByLabelText(`2026-08-03 일기 ${MAX_PER_DAY}개`);
+    const cell = await screen.findByLabelText(new RegExp(`^2026년 8월 3일, 일기 ${MAX_PER_DAY}개`));
     expect(cell.querySelectorAll('.calendar-dot')).toHaveLength(MAX_PER_DAY);
   });
 
@@ -89,9 +99,9 @@ describe('CalendarPage', () => {
     renderPage();
     await screen.findByText('2026년 8월');
 
-    expect((screen.getByLabelText('2026-08-16') as HTMLButtonElement).disabled).toBe(true);
-    expect((screen.getByLabelText('2026-08-15') as HTMLButtonElement).disabled).toBe(false);
-    expect((screen.getByLabelText('2026-08-14') as HTMLButtonElement).disabled).toBe(false);
+    expect((screen.getByLabelText('2026년 8월 16일') as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByLabelText('2026년 8월 15일') as HTMLButtonElement).disabled).toBe(false);
+    expect((screen.getByLabelText('2026년 8월 14일') as HTMLButtonElement).disabled).toBe(false);
   });
 
   it('이전 달과 다음 달로 넘길 수 있다', async () => {
@@ -133,7 +143,7 @@ describe('CalendarPage 날짜 패널', () => {
     renderPage();
     await screen.findByText('2026년 8월');
 
-    await user.click(screen.getByLabelText('2026-08-03 일기 2개'));
+    await user.click(screen.getByLabelText(/^2026년 8월 3일, 일기 2개/));
     expect(screen.getByText('2026년 8월 3일 (월) · 2 / 3개')).toBeDefined();
     expect(screen.getByText('첫째 일기')).toBeDefined();
     expect(screen.getByText('둘째 일기')).toBeDefined();

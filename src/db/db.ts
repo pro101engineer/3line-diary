@@ -1,7 +1,13 @@
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
 import { v4 as uuidv4 } from 'uuid';
 import { DiaryEntry, Topic } from '../types';
-import { MAX_PER_DAY, MAX_TOPICS, MAX_TOPIC_NAME, hasTopicName } from '../utils/topics';
+import {
+  MAX_PER_DAY,
+  MAX_TOPICS,
+  MAX_TOPIC_NAME,
+  hasTopicName,
+  normalizeTopicColor,
+} from '../utils/topics';
 
 interface DiaryDB extends DBSchema {
   entries: {
@@ -146,7 +152,10 @@ export async function deleteEntries(ids: string[]): Promise<void> {
 
 export async function listTopics(): Promise<Topic[]> {
   const db = await getDB();
-  return (await db.getAll('topics')).sort((a, b) => a.createdAt - b.createdAt);
+  const topics = await db.getAll('topics');
+  return topics
+    .map((t) => ({ ...t, color: normalizeTopicColor(t.color) }))
+    .sort((a, b) => a.createdAt - b.createdAt);
 }
 
 export interface TopicInput {
